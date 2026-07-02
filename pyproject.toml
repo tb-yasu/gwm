@@ -87,6 +87,6 @@ build = [
   "cp313-*",
   "cp314-*",
 ]
-skip = ["*-win*", "*-musllinux*", "pp*", "cp314t-*"]
+skip = ["*-win*", "*-musllinux*", "cp314t-*"]
 test-requires = "pytest"
 test-command = "pytest {project}/python/tests"
