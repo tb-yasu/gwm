@@ -49,7 +49,7 @@ python -m pip install --upgrade build "twine>=6.1"   # >=6.1 for Metadata 2.4 (l
 
 # macOS only: pin the same deployment target CI uses for this arch, otherwise
 # the wheel tag reflects whatever OS version happens to be running the build.
-export MACOSX_DEPLOYMENT_TARGET=11.0   # 10.13 for an Intel build
+export MACOSX_DEPLOYMENT_TARGET=11.0   # 10.15 for an Intel build (see wheels.yml)
 
 python -m build
 twine check dist/*

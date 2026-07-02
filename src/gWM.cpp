@@ -461,6 +461,10 @@ void gWM::constructor(const char *fname, const char *oname, int _iteration) {
 
 void gWM::buildIndex(const string &fname, int _iteration) {
   iteration = _iteration;
+  // WLKernel::readfile() appends to graphKernel.graphs; clear it first so
+  // reusing one gWM instance for a second buildIndex() call doesn't merge
+  // the new database into the previous one.
+  graphKernel.graphs.clear();
   if (graphKernel.readfile(fname.c_str()) != 0)
     throw runtime_error("cannot open: " + fname);
   buildIndexCore();
@@ -507,6 +511,14 @@ vector<vector<uint64_t>> gWM::encodeQueryGraphs(vector<Graph> &&graphs) const {
 
 vector<pair<uint32_t, float>>
 gWM::searchEncoded(const vector<uint64_t> &query, float threshold) {
+  // vnums is only populated by a prior buildIndex()/buildIndexFromGraphs()/
+  // loadIndex(); on a default-constructed gWM (reachable from Python via
+  // the low-level _core.Index() before build()/load()) depth is still 0, so
+  // rangeDfs would treat {0,{}} as an immediate leaf and read vnums[0] out
+  // of bounds. An empty query is also always a no-op, so skip the (correct
+  // but wasted) full-tree traversal it would otherwise cause.
+  if (vnums.empty() || query.empty())
+    return {};
   kernelThreshold  = threshold;
   kernelThreshold2 = kernelThreshold * kernelThreshold;
   vector<pair<uint32_t, float>> ids;

@@ -29,7 +29,10 @@ jobs:
           # macos-15 is pinned (not macos-latest, which has moved to 26) so
           # the arm64 deployment target below doesn't silently drift.
           - os: macos-15-intel
-            macosx_deployment_target: "10.13"
+            # cibuildwheel enforces 10.15 as the floor for the Python
+            # versions we build here; 10.13 is silently bumped to 10.15 with
+            # a warning, so declare the real value instead.
+            macosx_deployment_target: "10.15"
           - os: macos-15
             macosx_deployment_target: "11.0"
     steps:

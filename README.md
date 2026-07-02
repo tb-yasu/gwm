@@ -17,7 +17,8 @@ This is the reference implementation of:
 > https://doi.org/10.1137/1.9781611972818.14
 
 The package was previously distributed as **gWT**; `gwm` is the same
-algorithm and file format under a new name.
+algorithm and input format under a new name (the on-disk index format is an
+internal implementation detail and isn't guaranteed to match gWT's).
 
 ## Installation
 
