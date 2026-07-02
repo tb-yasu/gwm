@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "gWM"
-version = "3.1.4"
+version = "3.1.5"
 description = "Graph-indexing wavelet matrix for similarity search over large graph databases"
 readme = "README.md"
 license = "MIT AND LGPL-2.1-or-later"

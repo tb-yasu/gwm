@@ -10,28 +10,11 @@ features and indexes that feature space with a
 answered by traversing the wavelet matrix rather than explicitly scoring
 every database graph. It has no Python runtime dependencies.
 
-This is the reference implementation of:
-
-> Yasuo Tabei and Koji Tsuda. **Kernel-based Similarity Search in Massive
-> Graph Databases with Wavelet Trees.** *Proceedings of the 2011 SIAM
-> International Conference on Data Mining (SDM), pp. 154–163.*
-> https://doi.org/10.1137/1.9781611972818.14
-
-```bibtex
-@inproceedings{tabei2011kernel,
-  author    = {Yasuo Tabei and Koji Tsuda},
-  title     = {Kernel-based Similarity Search in Massive Graph Databases with Wavelet Trees},
-  booktitle = {Proceedings of the Eleventh SIAM International Conference on Data Mining (SDM)},
-  pages     = {154--163},
-  publisher = {SIAM},
-  year      = {2011},
-  doi       = {10.1137/1.9781611972818.14},
-}
-```
-
-The package was previously distributed as **gWT**; `gWM` is the same
-algorithm and input format under a new name (the on-disk index format is an
-internal implementation detail and isn't guaranteed to match gWT's).
+`gWM` is the reference implementation of Tabei and Tsuda's graph-kernel
+similarity search method (SDM 2011; full citation [below](#citation)). The
+package was previously distributed as **gWT**; `gWM` is the same algorithm
+and input format under a new name (the on-disk index format is an internal
+implementation detail and isn't guaranteed to match gWT's).
 
 ## Installation
 
@@ -214,6 +197,27 @@ cmake -S . -B build && cmake --build build
 
 Both require only a C++17 compiler; all non-standard code the build uses is
 vendored in the repository (see [License](#license)).
+
+## Citation
+
+If you use `gWM` in published work, please cite:
+
+> Yasuo Tabei and Koji Tsuda. **Kernel-based Similarity Search in Massive
+> Graph Databases with Wavelet Trees.** *Proceedings of the 2011 SIAM
+> International Conference on Data Mining (SDM), pp. 154–163.*
+> https://doi.org/10.1137/1.9781611972818.14
+
+```bibtex
+@inproceedings{tabei2011kernel,
+  author    = {Yasuo Tabei and Koji Tsuda},
+  title     = {Kernel-based Similarity Search in Massive Graph Databases with Wavelet Trees},
+  booktitle = {Proceedings of the Eleventh SIAM International Conference on Data Mining (SDM)},
+  pages     = {154--163},
+  publisher = {SIAM},
+  year      = {2011},
+  doi       = {10.1137/1.9781611972818.14},
+}
+```
 
 ## License
 
