@@ -1,5 +1,6 @@
-# Claude Code local runtime state (not project source)
+# Claude Code local runtime state and project instructions (not published)
 .claude/
+CLAUDE.md
 
 # C++ build artifacts (src/Makefile)
 src/*.o
