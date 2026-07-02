@@ -1,6 +1,6 @@
-# gwm
+# gWM
 
-`gwm` finds every graph in a database whose similarity to a query graph is
+`gWM` finds every graph in a database whose similarity to a query graph is
 at least a given threshold — it answers *threshold* queries, not top-k or
 approximate nearest-neighbor search.
 
@@ -29,7 +29,7 @@ This is the reference implementation of:
 }
 ```
 
-The package was previously distributed as **gWT**; `gwm` is the same
+The package was previously distributed as **gWT**; `gWM` is the same
 algorithm and input format under a new name (the on-disk index format is an
 internal implementation detail and isn't guaranteed to match gWT's).
 
@@ -62,7 +62,7 @@ for hits in index.search_file("query.gsp", threshold=0.8):
 
 `graph_id` is always the graph's 0-based position in the database (file
 order, or list order for in-memory graphs) — *not* the id written on a
-gSpan file's `t #` line, which `gwm` ignores (see
+gSpan file's `t #` line, which `gWM` ignores (see
 [Graph file format](#graph-file-format)).
 
 Graphs can also be built and searched entirely in memory. Each graph is a
@@ -136,7 +136,7 @@ lines between records are optional (a new `t #` line is itself enough to
 end the previous record):
 
 ```
-t # <anything ignored by gwm>
+t # <anything ignored by gWM>
 v <vertex-id> <vertex-label>
 e <from> <to> <edge-label>
 ```
@@ -186,15 +186,15 @@ without explicitly scoring every database graph one by one.
   regardless of a gSpan file's `from`/`to` order.
 - Similarity is computed over binary WL subtree-feature sets (present or
   absent), not per-code counts.
-- `gwm` supports threshold search, not top-k or approximate
+- `gWM` supports threshold search, not top-k or approximate
   nearest-neighbor search.
 - The on-disk index format is an internal detail and isn't guaranteed to be
-  stable across `gwm` versions or compatible with indexes produced by the
+  stable across `gWM` versions or compatible with indexes produced by the
   original gWT package.
 
 ## When to use
 
-`gwm` is useful when you have a mostly-static graph database and need to
+`gWM` is useful when you have a mostly-static graph database and need to
 run many threshold-similarity queries against it. For a one-off query
 against a small database, a plain linear scan may be simpler and just as
 fast.
@@ -217,7 +217,7 @@ vendored in the repository (see [License](#license)).
 
 ## License
 
-gwm's own code is MIT licensed (see [LICENSE](LICENSE)). It vendors
+gWM's own code is MIT licensed (see [LICENSE](LICENSE)). It vendors
 Sebastiano Vigna's [sux](https://sux.di.unimi.it/) rank/select library
 (`src/rank9sel.{h,cpp}`, `src/macros.h`, `src/popcount.h`), which is
 LGPL-2.1-or-later (see [LICENSES/LGPL-2.1-or-later.txt](LICENSES/LGPL-2.1-or-later.txt)).

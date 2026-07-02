@@ -37,7 +37,7 @@ const char *indexFile       = nullptr;
 float       kernelThreshold = 0.8f;
 
 void version() {
-  std::cerr << "gWM version 3.1.3" << std::endl
+  std::cerr << "gWM version 3.1.4" << std::endl
             << "Written by Yasuo Tabei" << std::endl
             << std::endl;
 }
