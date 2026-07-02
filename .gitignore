@@ -1,0 +1,27 @@
+# Claude Code local runtime state (not project source)
+.claude/
+
+# C++ build artifacts (src/Makefile)
+src/*.o
+src/*.d
+src/gwm-build
+src/gwm-search
+src/*.dSYM/
+
+# CMake / scikit-build-core out-of-tree builds
+build/
+_skbuild/
+
+# Python packaging
+dist/
+wheelhouse/
+*.egg-info/
+python/gwm/_core*.so
+python/gwm/_core*.pyd
+
+# Python runtime
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/

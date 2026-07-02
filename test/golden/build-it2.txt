@@ -1,0 +1,3 @@
+length of id list:13717
+depth of wavelet matrix:10
+total memory (byte): 29576

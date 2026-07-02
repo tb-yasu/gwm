@@ -1,0 +1,92 @@
+[build-system]
+requires = ["scikit-build-core>=0.12", "pybind11>=3.0"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "gwm"
+version = "3.1.2"
+description = "Similarity search over graph databases using the Weisfeiler-Lehman kernel and a wavelet matrix"
+readme = "README.md"
+license = "MIT AND LGPL-2.1-or-later"
+license-files = ["LICENSE", "LICENSES/*"]
+authors = [{ name = "Yasuo Tabei" }]
+requires-python = ">=3.9"
+dependencies = []
+keywords = [
+  "graph",
+  "graph-similarity",
+  "graph-database",
+  "weisfeiler-lehman",
+  "graph-kernel",
+  "wavelet-tree",
+  "wavelet-matrix",
+  "gWT",
+  "cheminformatics",
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: C++",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Chemistry",
+  "Topic :: Software Development :: Libraries",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
+]
+
+[project.urls]
+Homepage = "https://github.com/tb-yasu/gwm"
+Repository = "https://github.com/tb-yasu/gwm"
+Paper = "https://doi.org/10.1137/1.9781611972818.14"
+
+[project.scripts]
+gwm = "gwm._cli:main"
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.scikit-build]
+minimum-version = "0.12"
+wheel.packages = ["python/gwm"]
+
+[tool.scikit-build.cmake.define]
+GWM_BUILD_PYTHON = "ON"
+
+[tool.scikit-build.sdist]
+exclude = [
+  "dat/CACMvsCI.gsp",
+  "dat/CAvsCI.gsp",
+  "dat/CAvsCM.gsp",
+  "src/*.o",
+  "src/*.d",
+  "src/gwm-build",
+  "src/gwm-search",
+  "src/*.dSYM",
+  "build",
+  "_skbuild",
+  "*.egg-info",
+  "__pycache__",
+  ".venv",
+  "venv",
+  ".pytest_cache",
+]
+
+[tool.cibuildwheel]
+build = [
+  "cp39-*",
+  "cp310-*",
+  "cp311-*",
+  "cp312-*",
+  "cp313-*",
+  "cp314-*",
+]
+skip = ["*-win*", "*-musllinux*", "pp*", "cp314t-*"]
+test-requires = "pytest"
+test-command = "pytest {project}/python/tests"
