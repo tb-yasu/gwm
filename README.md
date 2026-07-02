@@ -1,20 +1,33 @@
 # gwm
 
-Similarity search over graph databases, in Python or from the command line.
+`gwm` finds every graph in a database whose similarity to a query graph is
+at least a given threshold — it answers *threshold* queries, not top-k or
+approximate nearest-neighbor search.
 
-`gwm` represents every graph as the set of subtree patterns found by the
-Weisfeiler-Lehman (WL) graph kernel, indexes that feature space with a
-[wavelet matrix](https://en.wikipedia.org/wiki/Wavelet_Tree), and answers
-threshold queries — "every database graph whose cosine similarity with this
-query graph is at least θ" — with a single DFS over the matrix instead of a
-linear scan. It has no runtime dependencies.
+It encodes each graph as a binary set of Weisfeiler-Lehman (WL) subtree
+features and indexes that feature space with a
+[wavelet matrix](https://en.wikipedia.org/wiki/Wavelet_Tree). Queries are
+answered by traversing the wavelet matrix rather than explicitly scoring
+every database graph. It has no Python runtime dependencies.
 
 This is the reference implementation of:
 
 > Yasuo Tabei and Koji Tsuda. **Kernel-based Similarity Search in Massive
 > Graph Databases with Wavelet Trees.** *Proceedings of the 2011 SIAM
-> International Conference on Data Mining (SDM), pp. 154–165.*
+> International Conference on Data Mining (SDM), pp. 154–163.*
 > https://doi.org/10.1137/1.9781611972818.14
+
+```bibtex
+@inproceedings{tabei2011kernel,
+  author    = {Yasuo Tabei and Koji Tsuda},
+  title     = {Kernel-based Similarity Search in Massive Graph Databases with Wavelet Trees},
+  booktitle = {Proceedings of the Eleventh SIAM International Conference on Data Mining (SDM)},
+  pages     = {154--163},
+  publisher = {SIAM},
+  year      = {2011},
+  doi       = {10.1137/1.9781611972818.14},
+}
+```
 
 The package was previously distributed as **gWT**; `gwm` is the same
 algorithm and input format under a new name (the on-disk index format is an
@@ -27,9 +40,9 @@ pip install gwm
 ```
 
 Prebuilt wheels are provided for Linux (x86_64, aarch64) and macOS (x86_64,
-arm64) on CPython 3.9–3.14. There are no Windows wheels; other platforms can
-build from the source distribution, which needs only a C++17 compiler (see
-[Building from source](#building-from-source)).
+arm64) on CPython 3.9–3.14. There are no Windows wheels; other platforms may
+be able to build from the source distribution, which needs only a C++17
+compiler (see [Building from source](#building-from-source)).
 
 ## Quickstart
 
@@ -46,6 +59,11 @@ index = gwm.Index.load("index.bin")
 for hits in index.search_file("query.gsp", threshold=0.8):
     print(hits)  # [(graph_id, similarity), ...], one list per query graph
 ```
+
+`graph_id` is always the graph's 0-based position in the database (file
+order, or list order for in-memory graphs) — *not* the id written on a
+gSpan file's `t #` line, which `gwm` ignores (see
+[Graph file format](#graph-file-format)).
 
 Graphs can also be built and searched entirely in memory. Each graph is a
 `(labels, edges)` pair: `labels` is a 0-based list of integer vertex labels,
@@ -86,8 +104,8 @@ standard `.nodes(data=True)` / `.edges(data=True)` protocol.
 - `Index.build(path, iteration=2)`, `Index.build_from_graphs(graphs, iteration=2)` — construct.
 - `Index.load(path)` / `index.save(path)` — the two sides of the on-disk index format.
 - `index.search_file(path, threshold)`, `index.search_graphs(graphs, threshold)` — encode queries with the index's own label dictionary and search in one call.
-- `index.encode_query_file(path)`, `index.encode_query_graphs(graphs)` — encode only, returning each query graph's WL label set (`list[list[int]]`) for reuse with `search_encoded`.
-- `index.search_encoded(labels, threshold)` — search a single already-encoded query.
+- `index.encode_query_file(path)`, `index.encode_query_graphs(graphs)` — encode only, returning each query graph's WL code set (`list[list[int]]`) for reuse with `search_encoded`.
+- `index.search_encoded(labels, threshold)` — search a single already-encoded query, where `labels` is one WL code set returned by `encode_query_file`/`encode_query_graphs`.
 - `index.num_graphs`, `index.iterations`, `index.matrix_depth`, `index.index_length`, `index.memory_bytes` — index statistics.
 
 `threshold` must be in `(0, 1]`; it is the cosine-similarity cutoff, not a
@@ -105,41 +123,81 @@ gwm build -iteration 2 db.gsp index.bin
 gwm search -kthreshold 0.8 index.bin query.gsp
 ```
 
-Building from source (see below) also produces standalone, dependency-free
-`gwm-build` / `gwm-search` binaries with the same options; these are not part
-of the pip package.
+The single-dash `-iteration` / `-kthreshold` flags (not `--iteration`) match
+the legacy gWT CLI. Building from source (see below) also produces
+standalone `gwm-build` / `gwm-search` binaries with no external library
+dependencies and the same options; these are not part of the pip package.
 
 ## Graph file format
 
 Both the CLI and `Index.build`/`search_file` read databases and queries in
-gSpan format — one record per graph, separated by a blank line:
+gSpan format — one record per graph, starting with a `t #` line; blank
+lines between records are optional (a new `t #` line is itself enough to
+end the previous record):
 
 ```
-t # <graph-id> <class-label> <name>
+t # <anything ignored by gwm>
 v <vertex-id> <vertex-label>
 e <from> <to> <edge-label>
 ```
 
-Vertex ids are 1-based and must be declared with `v` before they appear in an
-`e` line. `gwm.read_gspan(path)` parses this format into the same
-`(labels, edges)` list used by the in-memory API.
+The tokens after `t #` (conventionally a graph id, a class label, and a
+name) are ignored by the index — as noted above, a graph's `graph_id` in
+results is its 0-based position in the file, not this field. Vertex ids
+are 1-based positive integers and must be declared with `v` before they
+appear in an `e` line; vertex and edge labels must be non-negative
+integers. Vertex ids should be contiguous starting at 1 — gaps are not
+rejected, but are silently filled with extra zero-label, edgeless vertices
+that then contribute their own WL features. Graphs are treated as
+undirected, and self-loops and repeated
+edges are read as given (not rejected or merged). `gwm.read_gspan(path)`
+parses this format into a list of `(labels, edges)` graphs used by the
+in-memory API.
 
 ## How it works
 
-For each graph, every WL relabeling round produces one signature string per
+For each graph, the initial vertex labels are used as round-0 features;
+each subsequent WL relabeling round then produces one signature string per
 vertex (its own label, then its sorted `(neighbor label, edge label)`
-multiset); each distinct signature is assigned a dense integer code shared
+multiset). Each distinct signature is assigned a dense integer code shared
 across the whole database. A graph's feature set is the deduplicated set of
-codes seen across all rounds, and its norm is the size of that set.
+codes seen across all rounds. Unlike the counted feature vectors some WL
+subtree-kernel implementations use, this is a *binary* feature vector — a
+code is either in a graph's set or it isn't — so a feature set's squared L2
+norm is simply its size.
+
+`iteration` (default 2) is the number of WL relabeling rounds run *after*
+the initial vertex labels, so `iteration=2` contributes three rounds of
+features per graph: the initial labels, plus two rounds of relabeling.
 
 At build time, every code's posting list (the graphs containing it) is
 concatenated into one sequence and stored as a wavelet matrix. At query time,
 each of the query's codes contributes its interval in that sequence; a DFS
 over the matrix intersects those intervals level by level, pruning any
 subtree whose surviving range is already too small to reach the threshold.
-At a leaf, the surviving range size is `|query ∩ graph|`, giving the cosine
-similarity `|query ∩ graph| / sqrt(|query| · |graph|)` directly — no
-per-graph scan required.
+At a leaf, the surviving range size is the number of codes shared between
+the query's feature set `Q` and the graph's feature set `G`, giving the
+cosine similarity between them directly: `|Q ∩ G| / sqrt(|Q| · |G|)`,
+without explicitly scoring every database graph one by one.
+
+## Limitations
+
+- Graphs are treated as undirected; edges are stored symmetrically
+  regardless of a gSpan file's `from`/`to` order.
+- Similarity is computed over binary WL subtree-feature sets (present or
+  absent), not per-code counts.
+- `gwm` supports threshold search, not top-k or approximate
+  nearest-neighbor search.
+- The on-disk index format is an internal detail and isn't guaranteed to be
+  stable across `gwm` versions or compatible with indexes produced by the
+  original gWT package.
+
+## When to use
+
+`gwm` is useful when you have a mostly-static graph database and need to
+run many threshold-similarity queries against it. For a one-off query
+against a small database, a plain linear scan may be simpler and just as
+fast.
 
 ## Building from source
 
@@ -154,7 +212,8 @@ or with CMake:
 cmake -S . -B build && cmake --build build
 ```
 
-Both require only a C++17 compiler; there are no external dependencies.
+Both require only a C++17 compiler; all non-standard code the build uses is
+vendored in the repository (see [License](#license)).
 
 ## License
 

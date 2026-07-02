@@ -5,7 +5,7 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "gwm"
 version = "3.1.2"
-description = "Similarity search over graph databases using the Weisfeiler-Lehman kernel and a wavelet matrix"
+description = "Graph-indexing wavelet matrix for similarity search over large graph databases"
 readme = "README.md"
 license = "MIT AND LGPL-2.1-or-later"
 license-files = ["LICENSE", "LICENSES/*"]
