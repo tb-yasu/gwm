@@ -37,7 +37,7 @@ const char *indexFile = nullptr;
 int         iteration = 2;
 
 void version() {
-  std::cerr << "gWM version 3.1.6" << std::endl
+  std::cerr << "gWM version 3.1.7" << std::endl
             << "Written by Yasuo Tabei" << std::endl
             << std::endl;
 }

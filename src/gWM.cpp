@@ -202,7 +202,10 @@ void gWM::encodeQueries(WLKernel &queryGraphKernel,
 
 void gWM::searcher(const char *index, const char *name,
                    float _kernelThreshold) {
-  ifstream ifs(index);
+  // The index file is a raw binary dump (see save()/load()); ios::binary
+  // matters on Windows, where the default text mode would both translate
+  // \r\n and stop reading at the first 0x1A byte.
+  ifstream ifs(index, ios::binary);
   if (!ifs) {
     cerr << "cannot open:" << index << endl;
     exit(1);
@@ -448,7 +451,7 @@ void gWM::constructor(const char *fname, const char *oname, int _iteration) {
   fprintf(stdout, "total construction time (sec):%f\n",
           (endTime - startTime) / CLOCKS_PER_SEC);
 
-  ofstream ofs(oname);
+  ofstream ofs(oname, ios::binary);
   if (!ofs) {
     cerr << "cannot open:" << oname << endl;
     exit(1);
@@ -477,14 +480,14 @@ void gWM::buildIndexFromGraphs(vector<Graph> &&graphs, int _iteration) {
 }
 
 void gWM::saveIndex(const string &path) const {
-  ofstream ofs(path);
+  ofstream ofs(path, ios::binary);
   if (!ofs)
     throw runtime_error("cannot open: " + path);
   save(ofs);
 }
 
 void gWM::loadIndex(const string &path) {
-  ifstream ifs(path);
+  ifstream ifs(path, ios::binary);
   if (!ifs)
     throw runtime_error("cannot open: " + path);
   graphKernel.initialize();
