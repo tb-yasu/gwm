@@ -25,6 +25,11 @@ jobs:
           # Linux: native runners, no QEMU cross-build.
           - os: ubuntu-24.04
           - os: ubuntu-24.04-arm
+          # Windows: amd64 only (win32/arm64 are skipped in pyproject.toml).
+          # Pinned to 2022 (VS2022), not windows-latest/windows-2025, which
+          # moved to VS2026 in June 2026 -- same rationale as pinning macOS
+          # below: avoid a just-migrated, less-battle-tested toolchain.
+          - os: windows-2022
           # macOS: two single-arch runners rather than one universal2 build.
           # macos-15 is pinned (not macos-latest, which has moved to 26) so
           # the arm64 deployment target below doesn't silently drift.

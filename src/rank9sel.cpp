@@ -25,8 +25,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <climits>
-#include <sys/time.h>
-#include <sys/resource.h>
 #include "rank9sel.h"
 
 #define ONES_PER_INVENTORY (512)

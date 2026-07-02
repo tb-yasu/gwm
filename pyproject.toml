@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "gWM"
-version = "3.1.5"
+version = "3.1.6"
 description = "Graph-indexing wavelet matrix for similarity search over large graph databases"
 readme = "README.md"
 license = "MIT AND LGPL-2.1-or-later"
@@ -87,6 +87,6 @@ build = [
   "cp313-*",
   "cp314-*",
 ]
-skip = ["*-win*", "*-musllinux*", "cp314t-*"]
+skip = ["*-win32", "*-win_arm64", "*-musllinux*", "cp314t-*"]
 test-requires = "pytest"
 test-command = "pytest {project}/python/tests"

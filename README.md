@@ -22,9 +22,9 @@ implementation detail and isn't guaranteed to match gWT's).
 pip install gwm
 ```
 
-Prebuilt wheels are provided for Linux (x86_64, aarch64) and macOS (x86_64,
-arm64) on CPython 3.9–3.14. There are no Windows wheels; other platforms may
-be able to build from the source distribution, which needs only a C++17
+Prebuilt wheels are provided for Linux (x86_64, aarch64), macOS (x86_64,
+arm64), and Windows (x86_64) on CPython 3.9–3.14. Other platforms may be
+able to build from the source distribution, which needs only a C++17
 compiler (see [Building from source](#building-from-source)).
 
 ## Quickstart
