@@ -1,4 +1,4 @@
-# gWM
+# gWM (graph-indexing wavelet matrix)
 
 `gWM` finds every graph in a database whose similarity to a query graph is
 at least a given threshold — it answers *threshold* queries, not top-k or
